@@ -1,6 +1,6 @@
 
 
-var cacheName = ["static-cache"];
+var cacheName = "static-cache";
 var urlsToCache = [
   '../index.html'
 ];
@@ -38,5 +38,8 @@ function fetchAndCache(url) {
   .catch(function(error) {
     console.log('Request failed:', error);
     // You could return a custom offline 404 page here
+    caches.open(cacheName).then(function(cache){
+      return cache.addAll(urlsToCache);
+    })
   });
 }
