@@ -1,11 +1,12 @@
-var CACHE_NAME = ["static-cache"];
+
+
+var cacheName = ["static-cache"];
 var urlsToCache = [
-  '.',
   '../index.html'
 ];
 self.addEventListener('install', function(event) {
   event.waitUntil(
-    caches.open(CACHE_NAME)
+    caches.open(cacheName)
     .then(function(cache) {
       return cache.addAll(urlsToCache);
     })
@@ -28,7 +29,7 @@ function fetchAndCache(url) {
     if (!response.ok) {
       throw Error(response.statusText);
     }
-    return caches.open(CACHE_NAME)
+    return caches.open(cacheName)
     .then(function(cache) {
       cache.put(url, response.clone());
       return response;
