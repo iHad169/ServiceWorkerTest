@@ -24,6 +24,7 @@ let CURRENT_CACHES = {
   offline: 'offline-v' + CACHE_VERSION
 };
 const OFFLINE_URL = [
+    '.',
     'index.html',
     'manifest.json'
 ];
