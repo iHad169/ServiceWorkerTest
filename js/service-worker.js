@@ -13,10 +13,6 @@
 
 'use strict';
 
-
-// In your service worker
-importScripts('https://cdnjs.cloudflare.com/ajax/libs/cache.adderall/1.0.0/cache.adderall.js');
-
 // Incrementing CACHE_VERSION will kick off the install event and force previously cached
 // resources to be cached again.
 const CACHE_VERSION = 1;
@@ -47,7 +43,6 @@ self.addEventListener('install', event => {
     fetch(createCacheBustedRequest(OFFLINE_URL)).then(function(response) {
       return caches.open(CURRENT_CACHES.offline).then(function(cache) {
         return cache.put(OFFLINE_URL, response);
-        //return adderall.addAll(cache, OFFLINE_URL);
       });
     })
   );
