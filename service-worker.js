@@ -19,7 +19,7 @@ importScripts('https://cdnjs.cloudflare.com/ajax/libs/cache.adderall/1.0.0/cache
 
 // Incrementing CACHE_VERSION will kick off the install event and force previously cached
 // resources to be cached again.
-const CACHE_VERSION = 1;
+const CACHE_VERSION = 2;
 let CURRENT_CACHES = {
   offline: 'offline-v' + CACHE_VERSION
 };
@@ -43,17 +43,21 @@ function createCacheBustedRequest(url) {
   return new Request(bustedUrl);
 }
 
-self.addEventListener('install', event => {
-  event.waitUntil(
-    // We can't use cache.add() here, since we want OFFLINE_URL to be the cache key, but
-    // the actual URL we end up requesting might include a cache-busting parameter.
-    fetch(createCacheBustedRequest(OFFLINE_URL)).then(function(response) {
-      return caches.open(CURRENT_CACHES.offline).then(function(cache) {
-        //return cache.put(OFFLINE_URL, response);
-        return adderall.addAll(cache, OFFLINE_URL);
-      });
-    })
-  );
+// 监听 service worker 的 install 事件
+self.addEventListener("install", function (event) {
+    // 如果监听到了 service worker 已经安装成功的话，就会调用 event.waitUntil 回调函数
+    event.waitUntil(
+        // 安装成功后操作 CacheStorage 缓存，使用之前需要先通过 caches.open() 打开对应缓存空间。
+        caches.open("cache-v2").then(function (cache) {
+            // 通过 cache 缓存对象的 addAll 方法添加 precache 缓存
+            return adderall.addAll(cache, [
+                '/',
+                '/index.html',
+                '/x.txt',
+                '/manifest.json'
+            ]);
+        })
+    );
 });
 
 self.addEventListener('activate', event => {
