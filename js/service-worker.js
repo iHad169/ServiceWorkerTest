@@ -49,8 +49,8 @@ self.addEventListener('install', event => {
     // the actual URL we end up requesting might include a cache-busting parameter.
     fetch(createCacheBustedRequest(OFFLINE_URL)).then(function(response) {
       return caches.open(CURRENT_CACHES.offline).then(function(cache) {
-        //return cache.put(OFFLINE_URL, response);
-        return adderall.addAll(cache, OFFLINE_URL);
+        return cache.put(OFFLINE_URL, response);
+        //return adderall.addAll(cache, OFFLINE_URL);
       });
     })
   );
