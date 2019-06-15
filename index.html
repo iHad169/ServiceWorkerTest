@@ -33,9 +33,10 @@
        "
 >
 
-<h1>XXXXX</h1>
+<h1>XXXX</h1>
 
 <script>
+var xxx = "123";
 
 // Register the service worker
 if ('serviceWorker' in navigator) {
@@ -47,7 +48,25 @@ if ('serviceWorker' in navigator) {
     	console.log('ServiceWorker registration failed: ', err);
     });
 }
+
+/**
+if ('serviceWorker' in navigator) {
+  caches.keys().then(function(cacheNames) {
+    cacheNames.forEach(function(cacheName) {
+      caches.delete(cacheName);
+    });
+  });
+}
+*/
+
+const updateChannel = new BroadcastChannel('precache-channel');
+updateChannel.addEventListener('message', event => {
+  if (confirm(`New content is available!. Click OK to refresh`)) {
+    window.location.reload();
+  }
+});
 </script>
+<script src="main.js"></script>
 </body>
 
 </html>

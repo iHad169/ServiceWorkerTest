@@ -1,35 +1,51 @@
 importScripts('https://storage.googleapis.com/workbox-cdn/releases/4.3.1/workbox-sw.js');
 
+// 檢查Workbox
 if (workbox) {
-  console.log(`Yay! Workbox is loaded 🎉`);
+  console.log("Yay! Workbox is loaded 🎉");
 } else {
-  console.log(`Boo! Workbox didn't load 😬`);
+  console.log("Boo! Workbox didn't load 😬");
 }
 
-workbox.routing.registerRoute(
-  // Cache CSS files
-  /.*\.css/,
-  // Use cache but update in the background ASAP
-  workbox.strategies.staleWhileRevalidate({
-    // Use a custom cache name
-    cacheName: 'css-cache',
-  })
-);
+// Cache名 設置
+workbox.core.setCacheNameDetails({
+    prefix: "HKNBP",
+    suffix: "v19",
+    precache: "pre-cache",
+    runtime: "runtime-cache"
+});
 
-workbox.routing.registerRoute(
-  // Cache image files
-  /.*\.(?:png|jpg|jpeg|svg|gif|html|txt)/,
-  // Use the cache if it's available
-  workbox.strategies.cacheFirst({
-    // Use a custom cache name
-    cacheName: 'image-cache',
-    plugins: [
-      new workbox.expiration.Plugin({
-        // Cache only 20 images
-        maxEntries: 20,
-        // Cache for a maximum of a week
-        maxAgeSeconds: 7 * 24 * 60 * 60,
-      })
-    ],
-  })
-);
+// 要存進cache storage裡的檔案清單
+var cacheFiles = [
+  ".",
+  "index.html",
+  "main.js",
+  'manifest.json'
+];
+
+// 使用precache功能，在offline下也可以執行
+workbox.precaching.precacheAndRoute(cacheFiles, {
+  // Ignore all URL parameters.
+  ignoreURLParametersMatching: [/.*/]
+});
+
+self.addEventListener('activate', function(event) {
+    event.waitUntil(
+        // 揀選舊版本cache去刪除
+        caches.keys().then(cacheNames => {
+            console.log("正儲存嘅版本Cache有: " + cacheNames);
+            return Promise.all(
+                cacheNames.filter(cacheName => {
+                    // return true為刪除冇使用緊嘅cache
+                    return cacheName !== workbox.core.cacheNames.precache;
+                }).map(cacheName => {
+                    console.log("刪除" + cacheName + "版本Cache");
+                    // 被filter判定為要刪除嘅cache去刪除
+                    return caches.delete(cacheName);
+                })
+            );
+        }).then(() => {
+            return self.clients.claim();
+        })
+    );
+});
